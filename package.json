@@ -2,7 +2,7 @@
   "name": "@yarastqt/ts-docgen",
   "version": "0.0.0-alpha.0",
   "scripts": {
-    "test": "jest __tests__/*.test.ts"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

@@ -3,12 +3,15 @@ import { getComponentFiles, FilesMap } from '../src/core/walker'
 
 const source = resolve(__dirname, '__fixtures__/Components1')
 
-const replaceSourceFromAllComponents = (source: string, files: FilesMap) => (
-  Object.entries((files)).reduce((acc, [key, values]) => ({
-    ...acc,
-    [key]: values.map((value) => value.replace(source, '')),
-  }), {})
-)
+const replaceSourceFromAllComponents = (source: string, files: FilesMap) => {
+  return Object.entries(files).reduce(
+    (acc, [key, values]) => ({
+      ...acc,
+      [key]: values.map((value) => value.replace(source, '')),
+    }),
+    {},
+  )
+}
 
 describe('walker', () => {
   test('should return array of files for all components', async () => {

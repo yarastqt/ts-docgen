@@ -1,35 +1,46 @@
 import { resolve } from 'path'
-import { getComponentFiles, FilesMap } from '../src/core/walker'
+import { getComponentsMap, ComponentsMap } from '../src/core/walker'
 
 const source = resolve(__dirname, '__fixtures__/Components1')
 
-const replaceSourceFromAllComponents = (source: string, files: FilesMap) => {
-  return Object.entries(files).reduce(
-    (acc, [key, values]) => ({
-      ...acc,
-      [key]: values.map((value) => value.replace(source, '')),
-    }),
-    {},
-  )
+const replaceSourceFromPath = (source: string, componentsMap: ComponentsMap) => {
+  for (const [key, values] of componentsMap.entries()) {
+    componentsMap.set(key, values.map((value) => value.replace(source, '')))
+  }
+  return componentsMap
 }
 
 describe('walker', () => {
   test('should return array of files for all components', async () => {
-    let files = await getComponentFiles(source)
-    files = replaceSourceFromAllComponents(source, files)
+    let componentsMap = await getComponentsMap(source)
+    componentsMap = replaceSourceFromPath(source, componentsMap)
 
-    expect(Object.keys(files).length).toBe(2)
-    expect(files.Component1.includes('/Component1/Component1.tsx')).toBeTruthy()
-    expect(files.Component1.includes('/Component1/_theme/Component1_theme_b.tsx')).toBeTruthy()
-    expect(files.Component1.includes('/Component1/_theme/Component1_theme_a.tsx')).toBeTruthy()
-    expect(files.Component2.includes('/Component2/Component2.tsx')).toBeTruthy()
+    expect(componentsMap.size).toBe(2)
+    expect(
+      (componentsMap.get('Component1') as string[]).includes('/Component1/Component1.tsx'),
+    ).toBeTruthy()
+    expect(
+      (componentsMap.get('Component1') as string[]).includes(
+        '/Component1/_theme/Component1_theme_b.tsx',
+      ),
+    ).toBeTruthy()
+    expect(
+      (componentsMap.get('Component1') as string[]).includes(
+        '/Component1/_theme/Component1_theme_a.tsx',
+      ),
+    ).toBeTruthy()
+    expect(
+      (componentsMap.get('Component2') as string[]).includes('/Component2/Component2.tsx'),
+    ).toBeTruthy()
   })
 
   test('should return array of files for selected component', async () => {
-    let files = await getComponentFiles(source, ['Component2'])
-    files = replaceSourceFromAllComponents(source, files)
+    let componentsMap = await getComponentsMap(source, ['Component2'])
+    componentsMap = replaceSourceFromPath(source, componentsMap)
 
-    expect(Object.keys(files).length).toBe(1)
-    expect(files.Component2.includes('/Component2/Component2.tsx')).toBeTruthy()
+    expect(componentsMap.size).toBe(1)
+    expect(
+      (componentsMap.get('Component2') as string[]).includes('/Component2/Component2.tsx'),
+    ).toBeTruthy()
   })
 })

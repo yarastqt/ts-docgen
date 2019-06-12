@@ -1,44 +1,40 @@
 import { resolve } from 'path'
 import fg from 'fast-glob'
 
-export type FilesMap = Record<string, string[]>
+export type ComponentsMap = Map<string, string[]>
 
-const groupFilesByComponentName = (files: string[]): FilesMap => {
-  return files.reduce<FilesMap>((acc, filePath) => {
-    const componentName = filePath.split('/')[0]
-    if (acc[componentName] === undefined) {
-      acc[componentName] = []
-    }
-    acc[componentName].push(filePath)
-    return acc
-  }, {})
+const groupFilesByComponentName = (files: string[]): ComponentsMap => {
+  const componentsMap = new Map<string, string[]>()
+  for (const file of files) {
+    const componentName = file.split('/')[0]
+    const prevFiles = componentsMap.get(componentName) || []
+    componentsMap.set(componentName, [...prevFiles, file])
+  }
+  return componentsMap
 }
 
-const resolveFilesPath = (src: string, filesMap: FilesMap): FilesMap => {
-  return Object.entries(filesMap).reduce<FilesMap>(
-    (acc, [componentName, componentFiles]) => ({
-      ...acc,
-      [componentName]: componentFiles.map((componentFile) => resolve(src, componentFile)),
-    }),
-    {},
-  )
+const resolveComponentFilesPath = (source: string, componentsMap: ComponentsMap) => {
+  for (const [key, values] of componentsMap.entries()) {
+    componentsMap.set(key, values.map((value) => resolve(source, value)))
+  }
+  return componentsMap
 }
 
 /**
- * Return map with component files and grouping by component name.
+ * Return map with component files and grouping them by component name.
  *
  * @param source Components sources
  * @param names Component names for searching
  * @param extensions Available extensions
  */
-export const getComponentFiles = async (
+export const getComponentsMap = async (
   source: string,
   names: string[] = [],
   extensions: string[] = ['tsx'],
-): Promise<FilesMap> => {
+): Promise<ComponentsMap> => {
   const pattern = `**/*.${extensions.join(',')}`
   const patterns = names.length > 0 ? names.map((name) => `${name}/${pattern}`) : [pattern]
   const filesList = await fg<string>(patterns, { cwd: source })
   const filesMap = groupFilesByComponentName(filesList)
-  return resolveFilesPath(source, filesMap)
+  return resolveComponentFilesPath(source, filesMap)
 }

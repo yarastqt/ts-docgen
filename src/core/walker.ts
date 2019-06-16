@@ -13,7 +13,7 @@ const groupFilesByComponentName = (files: string[]): ComponentsMap => {
   return componentsMap
 }
 
-const resolveComponentFilesPath = (source: string, componentsMap: ComponentsMap) => {
+const resolveComponentFilesPath = (source: string, componentsMap: ComponentsMap): ComponentsMap => {
   for (const [key, values] of componentsMap.entries()) {
     componentsMap.set(key, values.map((value) => resolve(source, value)))
   }

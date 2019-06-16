@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "fast-glob": "^2.2.7",
+    "ts-morph": "^2.3.0",
     "typescript": "^3.5.1"
   }
 }

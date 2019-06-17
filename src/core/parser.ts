@@ -15,9 +15,8 @@ export const extractMetaFromComponents = (files: string[]) => {
   const sourceFiles = project.addExistingSourceFiles(files)
 
   sourceFiles.forEach((sourceFile) => {
-    // const filePath = sourceFile.getFilePath();
     sourceFile.forEachChild((node) => {
-      jsDocResolver(node)
+      jsDocResolver(sourceFile, node)
     })
   })
 }

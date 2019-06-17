@@ -1,17 +1,11 @@
-import { Node, JSDoc, Project, TypeGuards, getCompilerOptionsFromTsConfig } from 'ts-morph'
+import { TypeAliasDeclaration, InterfaceDeclaration, Node, TypeGuards, SourceFile } from 'ts-morph'
+
+import { Maybe } from '../utility-types'
+import { getJsDocFromNode, getDescriptionFromNode, getPropTypes } from '../utils'
 
 const { isJSDocParameterTag, isClassDeclaration, isVariableStatement } = TypeGuards
-type Maybe<T> = T | undefined
 
-const getJsDocFromNode = (node: Node): Maybe<JSDoc> => {
-  if (isClassDeclaration(node) || isVariableStatement(node)) {
-    const jsDocs = node.getJsDocs()
-    return jsDocs[jsDocs.length - 1]
-  }
-  return undefined
-}
-
-const getInterfaceNameFromNode = (node: Node): Maybe<string> => {
+const getTypeNameFromNode = (node: Node): Maybe<string> => {
   const jsdoc = getJsDocFromNode(node)
   if (!jsdoc) {
     return undefined
@@ -32,8 +26,32 @@ const getInterfaceNameFromNode = (node: Node): Maybe<string> => {
   return undefined
 }
 
-export const jsDocResolver = (node: Node) => {
+const getTypeNodeFromSource = (
+  sourceFile: SourceFile,
+  interfaceOrTypeName: string,
+): Maybe<InterfaceDeclaration | TypeAliasDeclaration> => {
+  const interfaceNode = sourceFile.getInterface(interfaceOrTypeName)
+  const typeNode = sourceFile.getTypeAlias(interfaceOrTypeName)
+  return interfaceNode || typeNode
+}
+
+export const jsDocResolver = (sourceFile: SourceFile, node: Node) => {
+  const filePath = sourceFile.getFilePath()
+  const result = { filePath }
   if (isClassDeclaration(node) || isVariableStatement(node)) {
-    const componentInterfaceName = getInterfaceNameFromNode(node)
+    const componentInterfaceOrTypeName = getTypeNameFromNode(node)
+    const description = getDescriptionFromNode(node)
+    if (!componentInterfaceOrTypeName) {
+      Object.assign(result, { description })
+      return result
+    }
+    const typeNode = getTypeNodeFromSource(sourceFile, componentInterfaceOrTypeName)
+    if (!typeNode) {
+      // TODO: print warning.
+      return result
+    }
+    const props = getPropTypes(typeNode)
+    console.log(props)
   }
+  return result
 }

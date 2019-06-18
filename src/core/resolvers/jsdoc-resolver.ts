@@ -39,13 +39,13 @@ export const jsDocResolver = (sourceFile: SourceFile, node: Node) => {
   const filePath = sourceFile.getFilePath()
   const result = { filePath }
   if (isClassDeclaration(node) || isVariableStatement(node)) {
-    const componentInterfaceOrTypeName = getTypeNameFromNode(node)
+    const typeName = getTypeNameFromNode(node)
     const description = getDescriptionFromNode(node)
-    if (!componentInterfaceOrTypeName) {
+    if (!typeName) {
       Object.assign(result, { description })
       return result
     }
-    const typeNode = getTypeNodeFromSource(sourceFile, componentInterfaceOrTypeName)
+    const typeNode = getTypeNodeFromSource(sourceFile, typeName)
     if (!typeNode) {
       // TODO: print warning.
       return result

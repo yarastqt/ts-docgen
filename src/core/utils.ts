@@ -59,7 +59,43 @@ export const getPropsFromTypeNode = (node: Node): Symbol[] => {
     .filter((symbol) => !isInternalOrPrivate(symbol))
 }
 
-export const getPropTypes = (node: Node) => {
+export const getPropName = (symbol: Symbol): string => {
+  return symbol.getEscapedName()
+}
+
+export const getPropDescription = (symbol: Symbol) => {
+  const jsDocs = getJsDocFromSymbol(symbol)
+  if (!jsDocs) {
+    return undefined
+  }
+  return jsDocs.getComment()
+}
+
+export const isOptionalProp = (symbol: Symbol) => {
+  // @ts-ignore
+  return getDeclaration(symbol).hasQuestionToken()
+}
+
+export const getPropTypeData = (symbol: Symbol) => {
+  return {
+    name: getPropName(symbol),
+    description: getPropDescription(symbol),
+    optional: isOptionalProp(symbol),
+  }
+}
+
+type PropType = {
+  [key: string]: {}
+}
+
+export const getPropTypes = (node: Node): PropType => {
   const props = getPropsFromTypeNode(node)
-  return {}
+  return props.reduce((acc, prop) => {
+    const propName = getPropName(prop)
+    const propData = getPropTypeData(prop)
+    return {
+      ...acc,
+      [propName]: propData,
+    }
+  }, {})
 }

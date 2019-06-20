@@ -12,10 +12,12 @@ const getTypeNameFromNode = (node: Node): Maybe<string> => {
   }
   for (const tag of jsdoc.getTags()) {
     if (!isJSDocParameterTag(tag)) {
+      // eslint-disable-next-line no-continue
       continue
     }
     const typeExpression = tag.getTypeExpression()
     if (!typeExpression) {
+      // eslint-disable-next-line no-continue
       continue
     }
     const text = typeExpression.getTypeNode().getText()

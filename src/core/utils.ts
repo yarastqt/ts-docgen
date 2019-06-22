@@ -63,7 +63,7 @@ export const getPropName = (symbol: Symbol): string => {
   return symbol.getEscapedName()
 }
 
-export const getPropDescription = (symbol: Symbol) => {
+export const getPropDescription = (symbol: Symbol): Maybe<string> => {
   const jsDocs = getJsDocFromSymbol(symbol)
   if (!jsDocs) {
     return undefined

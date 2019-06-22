@@ -71,9 +71,12 @@ export const getPropDescription = (symbol: Symbol): Maybe<string> => {
   return jsDocs.getComment()
 }
 
-export const isOptionalProp = (symbol: Symbol) => {
-  // @ts-ignore
-  return getDeclaration(symbol).hasQuestionToken()
+export const isOptionalProp = (symbol: Symbol): boolean => {
+  const declaration = getDeclaration(symbol)
+  if (TypeGuards.isQuestionTokenableNode(declaration)) {
+    return declaration.hasQuestionToken()
+  }
+  return false
 }
 
 export const getPropTypeData = (symbol: Symbol) => {

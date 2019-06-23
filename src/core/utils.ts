@@ -93,18 +93,17 @@ export const createPropType = (symbol: Symbol): PropType => {
   }
 }
 
-type PropType = {
-  [key: string]: {}
+export type PropTypes = {
+  [key: string]: PropType
 }
 
-export const getPropTypes = (node: Node): PropType => {
+export const getPropTypes = (node: Node): PropTypes => {
   const props = getPropsFromTypeNode(node)
   return props.reduce((acc, prop) => {
-    const propName = getPropName(prop)
-    const propData = getPropTypeData(prop)
+    const propData = createPropType(prop)
     return {
       ...acc,
-      [propName]: propData,
+      [propData.name]: propData,
     }
   }, {})
 }

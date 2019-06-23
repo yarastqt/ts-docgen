@@ -79,7 +79,13 @@ export const isOptionalProp = (symbol: Symbol): boolean => {
   return false
 }
 
-export const getPropTypeData = (symbol: Symbol) => {
+export type PropType = {
+  name: string
+  description?: string
+  optional: boolean
+}
+
+export const createPropType = (symbol: Symbol): PropType => {
   return {
     name: getPropName(symbol),
     description: getPropDescription(symbol),

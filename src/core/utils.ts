@@ -38,12 +38,12 @@ export const isReactSource = (symbol: Symbol): boolean => {
 }
 
 export const isInternalOrPrivate = (symbol: Symbol): boolean => {
-  const jsDocs = getJsDocFromSymbol(symbol)
+  const jsDoc = getJsDocFromSymbol(symbol)
   const excludedTags = ['internal', 'private']
-  if (!jsDocs) {
+  if (!jsDoc) {
     return false
   }
-  for (const tag of jsDocs.getTags()) {
+  for (const tag of jsDoc.getTags()) {
     if (excludedTags.includes(tag.getTagName())) {
       return true
     }
@@ -64,11 +64,11 @@ export const getPropName = (symbol: Symbol): string => {
 }
 
 export const getPropDescription = (symbol: Symbol): Maybe<string> => {
-  const jsDocs = getJsDocFromSymbol(symbol)
-  if (!jsDocs) {
+  const jsDoc = getJsDocFromSymbol(symbol)
+  if (!jsDoc) {
     return undefined
   }
-  return jsDocs.getComment()
+  return jsDoc.getComment()
 }
 
 export const isOptionalProp = (symbol: Symbol): boolean => {

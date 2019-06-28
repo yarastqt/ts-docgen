@@ -79,10 +79,25 @@ export const isOptionalProp = (symbol: Symbol): boolean => {
   return false
 }
 
+export const getPropDefaultValue = (symbol: Symbol): Maybe<string> => {
+  const jsDoc = getJsDocFromSymbol(symbol)
+  const defaultValueTags = ['default', 'defaultValue']
+  if (!jsDoc) {
+    return undefined
+  }
+  for (const tag of jsDoc.getTags()) {
+    if (defaultValueTags.includes(tag.getTagName())) {
+      return tag.getComment()
+    }
+  }
+  return undefined
+}
+
 export type PropType = {
   name: string
   description?: string
   optional: boolean
+  defaultValue?: string
 }
 
 export const createPropType = (symbol: Symbol): PropType => {
@@ -90,6 +105,7 @@ export const createPropType = (symbol: Symbol): PropType => {
     name: getPropName(symbol),
     description: getPropDescription(symbol),
     optional: isOptionalProp(symbol),
+    defaultValue: getPropDefaultValue(symbol),
   }
 }
 

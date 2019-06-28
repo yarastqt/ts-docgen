@@ -3,7 +3,8 @@
   "version": "0.0.0-alpha.0",
   "scripts": {
     "format": "prettier --write {__tests__,src}/**/*.ts",
-    "test": "jest"
+    "test": "npm run unit",
+    "unit": "jest"
   },
   "repository": {
     "type": "git",

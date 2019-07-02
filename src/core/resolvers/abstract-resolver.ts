@@ -1,16 +1,7 @@
-import { Node, SourceFile } from 'ts-morph'
+import { Resolver, ResolverData } from './interface'
 
-import { PropTypes } from '../utils'
-
-export type ResolverData = {
-  filePath: string
-  description?: string
-  componentName?: string
-  props?: PropTypes
-}
-
-export const abstractResolver = (sourceFile: SourceFile, node: Node): ResolverData => {
+export const abstractResolver: Resolver = (sourceFile) => {
   const filePath = sourceFile.getFilePath()
-  const result = { filePath }
+  const result: ResolverData = { filePath }
   return result
 }

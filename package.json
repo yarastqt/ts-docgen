@@ -4,6 +4,7 @@
   "scripts": {
     "format": "prettier --write {__tests__,src}/**/*.ts",
     "test": "npm run unit",
+    "unit:coverage": "npm run unit -- --coverage",
     "unit": "jest"
   },
   "repository": {

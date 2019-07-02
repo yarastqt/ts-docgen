@@ -1,17 +1,22 @@
-import { TypeAliasDeclaration, InterfaceDeclaration, Node, TypeGuards, SourceFile } from 'ts-morph'
+import { Node, TypeGuards } from 'ts-morph'
 
 import { Maybe } from '../utility-types'
-import { getJsDocFromNode, getDescriptionFromNode, getPropTypes } from '../utils'
+import {
+  getJsDocFromNode,
+  getDescriptionFromNode,
+  getPropTypes,
+  getComponentName,
+  getTypeNodeFromSource,
+} from '../utils'
+import { Resolver, ResolverData } from './interface'
 
-const { isJSDocParameterTag, isClassDeclaration, isVariableStatement } = TypeGuards
-
-const getTypeNameFromNode = (node: Node): Maybe<string> => {
+const getTypeNameFromJsDoc = (node: Node): Maybe<string> => {
   const jsdoc = getJsDocFromNode(node)
   if (!jsdoc) {
     return undefined
   }
   for (const tag of jsdoc.getTags()) {
-    if (!isJSDocParameterTag(tag)) {
+    if (!TypeGuards.isJSDocParameterTag(tag)) {
       // eslint-disable-next-line no-continue
       continue
     }
@@ -28,32 +33,28 @@ const getTypeNameFromNode = (node: Node): Maybe<string> => {
   return undefined
 }
 
-const getTypeNodeFromSource = (
-  sourceFile: SourceFile,
-  interfaceOrTypeName: string,
-): Maybe<InterfaceDeclaration | TypeAliasDeclaration> => {
-  const interfaceNode = sourceFile.getInterface(interfaceOrTypeName)
-  const typeNode = sourceFile.getTypeAlias(interfaceOrTypeName)
-  return interfaceNode || typeNode
-}
-
-export const jsDocResolver = (sourceFile: SourceFile, node: Node) => {
-  const filePath = sourceFile.getFilePath()
-  const result = { filePath }
-  if (isClassDeclaration(node) || isVariableStatement(node)) {
-    const typeName = getTypeNameFromNode(node)
+export const jsDocResolver: Resolver = (sourceFile, node) => {
+  // Right now filePath is empty, but abstract-resolver should write them.
+  const result: ResolverData = { filePath: '' }
+  if (TypeGuards.isClassDeclaration(node) || TypeGuards.isVariableStatement(node)) {
+    const typeName = getTypeNameFromJsDoc(node)
+    const componentName = getComponentName(sourceFile, node)
     const description = getDescriptionFromNode(node)
-    if (!typeName) {
+    if (componentName !== undefined) {
+      Object.assign(result, { componentName })
+    }
+    if (description !== undefined) {
       Object.assign(result, { description })
+    }
+    if (typeName === undefined) {
       return result
     }
     const typeNode = getTypeNodeFromSource(sourceFile, typeName)
-    if (!typeNode) {
-      // TODO: print warning.
+    if (typeNode === undefined) {
       return result
     }
     const props = getPropTypes(typeNode)
-    console.log(props)
+    Object.assign(result, { props })
   }
   return result
 }

@@ -1,6 +1,73 @@
-import { Symbol, Node, JSDoc, TypeGuards } from 'ts-morph'
+import {
+  Symbol,
+  Node,
+  JSDoc,
+  TypeGuards,
+  SyntaxKind,
+  SourceFile,
+  ClassDeclaration,
+  VariableStatement,
+  TypeAliasDeclaration,
+  InterfaceDeclaration,
+} from 'ts-morph'
 
 import { Maybe } from './utility-types'
+
+export const getComponentName = (
+  sourceFile: SourceFile,
+  node: ClassDeclaration | VariableStatement,
+): Maybe<string> => {
+  if (TypeGuards.isClassDeclaration(node)) {
+    // TODO: Get name from from static displayName.
+    // Class may be exports as anonymous.
+    return node.getName()
+  }
+  if (TypeGuards.isVariableStatement(node)) {
+    const componentName = node.getDeclarations()[0].getName()
+    // try get name from static displayName.
+    const expressionStatement = sourceFile.getStatementByKind(SyntaxKind.ExpressionStatement)
+    if (expressionStatement === undefined) {
+      return componentName
+    }
+    const expression = expressionStatement.getExpression()
+    // Fn.displayName = 'content'
+    if (!TypeGuards.isBinaryExpression(expression)) {
+      return componentName
+    }
+    // Fn.displayName
+    const left = expression.getLeft()
+    // 'content'
+    const right = expression.getRight()
+    if (!TypeGuards.isPropertyAccessExpression(left)) {
+      return componentName
+    }
+    if (left.getName() !== 'displayName') {
+      return componentName
+    }
+    const leftExpression = left.getExpression()
+    if (!TypeGuards.isIdentifier(leftExpression)) {
+      return componentName
+    }
+    if (leftExpression.getText() !== componentName) {
+      return componentName
+    }
+    if (TypeGuards.isStringLiteral(right)) {
+      return right.getText()
+    }
+    // TODO: Get name from function.
+    return componentName
+  }
+  return undefined
+}
+
+export const getTypeNodeFromSource = (
+  sourceFile: SourceFile,
+  interfaceOrTypeName: string,
+): Maybe<InterfaceDeclaration | TypeAliasDeclaration> => {
+  const interfaceNode = sourceFile.getInterface(interfaceOrTypeName)
+  const typeNode = sourceFile.getTypeAlias(interfaceOrTypeName)
+  return interfaceNode || typeNode
+}
 
 export const getDeclaration = (symbol: Symbol): Node => {
   const declarations = symbol.getDeclarations()

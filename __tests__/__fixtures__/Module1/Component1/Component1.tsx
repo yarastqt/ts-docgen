@@ -3,6 +3,11 @@ export type Component1Props = {
    * prop1 description.
    */
   prop1: string
+
+  /**
+   * prop2 description.
+   */
+  prop2?: string
 }
 
 /**

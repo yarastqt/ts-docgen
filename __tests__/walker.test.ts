@@ -1,8 +1,9 @@
 import { resolve } from 'path'
 import { getComponentsMap, ComponentsMap } from '../src/core/walker'
 
-const source = resolve(__dirname, '__fixtures__/Components1')
+const source = resolve(__dirname, '__fixtures__/Module1')
 
+// eslint-disable-next-line no-shadow
 const replaceSourceFromPath = (source: string, componentsMap: ComponentsMap) => {
   for (const [key, values] of componentsMap.entries()) {
     componentsMap.set(key, values.map((value) => value.replace(source, '')))

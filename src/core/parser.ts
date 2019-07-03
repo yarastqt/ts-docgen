@@ -1,8 +1,7 @@
 import { Project } from 'ts-morph'
 import { JsxEmit } from 'typescript'
 
-import { Resolver, ResolverData } from './resolvers/interface'
-import { abstractResolver } from './resolvers/abstract-resolver'
+import { Resolver, ResolverData, EnhancedResolverData } from './resolvers/interface'
 import { MaybeArray } from './utility-types'
 
 const projectOptions = {
@@ -14,20 +13,21 @@ const projectOptions = {
 export const extractMetaFromComponents = (
   files: string[],
   resolvers: Resolver[],
-): MaybeArray<ResolverData> => {
-  const result: Record<string, ResolverData> = {}
+): MaybeArray<EnhancedResolverData> => {
+  const result: Record<string, EnhancedResolverData> = {}
   const project = new Project(projectOptions)
   const sourceFiles = project.addExistingSourceFiles(files)
   sourceFiles.forEach((sourceFile) => {
+    const filePath = sourceFile.getFilePath()
     sourceFile.forEachChild((node) => {
-      const data = [...resolvers, abstractResolver].reduce(
+      const data = resolvers.reduce<ResolverData>(
         (acc, resolver) => ({ ...acc, ...resolver(sourceFile, node) }),
-        {} as ResolverData,
+        {},
       )
-      if (result[data.filePath] === undefined) {
-        result[data.filePath] = data
+      if (result[filePath] === undefined) {
+        result[filePath] = { ...data, filePath }
       } else {
-        Object.assign(result[data.filePath], data)
+        Object.assign(result[filePath], data)
       }
     })
   })

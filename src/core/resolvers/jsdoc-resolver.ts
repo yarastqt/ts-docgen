@@ -34,8 +34,7 @@ const getTypeNameFromJsDoc = (node: Node): Maybe<string> => {
 }
 
 export const jsDocResolver: Resolver = (sourceFile, node) => {
-  // Right now filePath is empty, but abstract-resolver should write them.
-  const result: ResolverData = { filePath: '' }
+  const result: ResolverData = {}
   if (TypeGuards.isClassDeclaration(node) || TypeGuards.isVariableStatement(node)) {
     const typeName = getTypeNameFromJsDoc(node)
     const componentName = getComponentName(sourceFile, node)

@@ -3,24 +3,27 @@ import { getComponentsMap } from '../src/core/walker'
 import { extractMetaFromComponents } from '../src/core/parser'
 import { jsDocResolver } from '../src/core/resolvers/jsdoc-resolver'
 
-const source1 = resolve(__dirname, '__fixtures__/Module1')
+type ComponentsMeta = ReturnType<typeof extractMetaFromComponents>
 
 describe('parser', () => {
   describe('jsdoc-resolver', () => {
-    test('should return base information from component', async () => {
-      const componentsMap = await getComponentsMap(source1)
+    let componentsMeta: ComponentsMeta = []
+
+    beforeAll(async () => {
+      const source = resolve(__dirname, '__fixtures__/Module1')
+      const componentsMap = await getComponentsMap(source)
       const component1FilePath = componentsMap.get('Component1')
-      const [componentMeta] = extractMetaFromComponents(component1FilePath!, [jsDocResolver])
-      expect(componentMeta!.filePath).toMatch('Module1/Component1/Component1.tsx')
-      expect(componentMeta!.description).toBe('Component1 description.')
-      expect(componentMeta!.componentName).toBe('Component1')
+      componentsMeta = extractMetaFromComponents(component1FilePath!, [jsDocResolver])
+    })
+
+    test('should return base information from component', async () => {
+      expect(componentsMeta[0]!.filePath).toMatch('Module1/Component1/Component1.tsx')
+      expect(componentsMeta[0]!.description).toBe('Component1 description.')
+      expect(componentsMeta[0]!.componentName).toBe('Component1')
     })
 
     test('should return props information from component', async () => {
-      const componentsMap = await getComponentsMap(source1)
-      const component1FilePath = componentsMap.get('Component1')
-      const [componentMeta] = extractMetaFromComponents(component1FilePath!, [jsDocResolver])
-      expect(componentMeta!.props).toEqual({
+      expect(componentsMeta[0]!.props).toEqual({
         prop1: {
           name: 'prop1',
           description: 'prop1 description.',

@@ -31,5 +31,5 @@ export const extractMetaFromComponents = (
       }
     })
   })
-  return Object.entries(result).map(([, value]) => value)
+  return Object.values(result)
 }

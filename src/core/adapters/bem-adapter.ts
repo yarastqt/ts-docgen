@@ -10,6 +10,7 @@ const getComponentEntityRegExp = () => {
   return new RegExp(`^${block}${mod}${platform}$|^${block}${elem}${mod}${platform}$`)
 }
 
+// TODO: Use @bem/sdk.naming.cell.match, for this needed add component relative path to meta.
 const getComponentEntity = (path: string) => {
   const matchedComponentName = path.match(/\/([A-z0-9]+)+\..+$/)
 

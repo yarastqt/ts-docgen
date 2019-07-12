@@ -30,7 +30,7 @@ const resolveComponentFilesPath = (source: string, componentsMap: ComponentsMap)
 export const getComponentsMap = async (
   source: string,
   names: string[] = [],
-  extensions: string[] = ['tsx'],
+  extensions: string[] = ['ts', 'tsx'],
 ): Promise<ComponentsMap> => {
   const pattern = `**/*.${extensions.join(',')}`
   const patterns = names.length > 0 ? names.map((name) => `${name}/${pattern}`) : [pattern]

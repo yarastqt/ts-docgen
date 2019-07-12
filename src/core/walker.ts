@@ -32,7 +32,7 @@ export const getComponentsMap = async (
   names: string[] = [],
   extensions: string[] = ['ts', 'tsx'],
 ): Promise<ComponentsMap> => {
-  const pattern = `**/*.${extensions.join(',')}`
+  const pattern = `**/*.{${extensions.join(',')}}`
   const patterns = names.length > 0 ? names.map((name) => `${name}/${pattern}`) : [pattern]
   const filesList = await fg<string>(patterns, { cwd: source })
   const filesMap = groupFilesByComponentName(filesList)

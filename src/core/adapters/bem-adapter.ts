@@ -42,22 +42,63 @@ const getComponentEntity = (path: string) => {
   }
 }
 
+// TODO: Add return type.
 export const bemAdapter = (meta: EnhancedResolverData[]) => {
-  const result = {}
+  const temporaryMap = new Map<string, any /* EnhancedResolverData */>()
 
-  for (const { filePath } of meta) {
+  for (const { filePath, props, description, componentName } of meta) {
     const { platform, block, element, modifier } = getComponentEntity(filePath)
 
     // block case
     if (element === undefined && modifier === undefined) {
-      console.log(block)
+      if (temporaryMap.has(block)) {
+        // Add other props for same block at other platform.
+        const prevBlock = temporaryMap.get(block)
+        prevBlock.files = prevBlock.files.concat(filePath)
+        prevBlock.props[platform] = props
+
+        temporaryMap.set(block, prevBlock)
+      } else {
+        // Add props for block at current platform.
+        temporaryMap.set(block, {
+          componentName,
+          description,
+          files: [filePath],
+          props: {
+            [platform]: props,
+          },
+        })
+      }
     }
 
     // block modifier case
     if (element === undefined && modifier !== undefined) {
-      console.log(modifier)
+      if (temporaryMap.has(modifier.name)) {
+        const prevModifier = temporaryMap.get(modifier.name)
+        prevModifier.files = prevModifier.files.concat(filePath)
+
+        if (prevModifier.props[platform] === undefined) {
+          // Add other props for same modifier at other platform.
+          prevModifier.props[platform] = props
+        } else if (props !== undefined) {
+          // Add other value for same modifier at current platform.
+          prevModifier.props[platform][modifier.name].types.push(...props[modifier.name].types)
+        }
+
+        temporaryMap.set(modifier.name, prevModifier)
+      } else {
+        // Add props for modifier at current platform.
+        temporaryMap.set(modifier.name, {
+          componentName: undefined,
+          description,
+          files: [filePath],
+          props: {
+            [platform]: props,
+          },
+        })
+      }
     }
   }
 
-  return {}
+  return [...temporaryMap.values()]
 }

@@ -4,7 +4,7 @@ import { Maybe } from '../utility-types'
 import {
   getJsDocFromNode,
   getDescriptionFromNode,
-  getPropTypes,
+  getProps,
   getComponentName,
   getTypeNodeFromSource,
 } from '../utils'
@@ -52,7 +52,7 @@ export const jsDocResolver: Resolver = (sourceFile, node) => {
     if (typeNode === undefined) {
       return result
     }
-    const props = getPropTypes(typeNode)
+    const props = getProps(typeNode)
     Object.assign(result, { props })
   }
   return result

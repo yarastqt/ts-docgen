@@ -180,7 +180,7 @@ export type PropTypes = {
   [key: string]: PropType
 }
 
-export const getPropTypes = (node: Node): PropTypes => {
+export const getProps = (node: Node): PropTypes => {
   const props = getPropsFromTypeNode(node)
   return props.reduce((acc, prop) => {
     const propData = createPropType(prop)

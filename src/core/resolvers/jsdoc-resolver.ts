@@ -26,7 +26,7 @@ const getTypeNameFromJsDoc = (node: Node): Maybe<string> => {
       continue
     }
     const text = typeExpression.getTypeNode().getText()
-    if (text.match(/.+Props/)) {
+    if (tag.getName() === 'props') {
       return text
     }
   }

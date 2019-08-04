@@ -33,10 +33,12 @@ const getComponentEntity = (path: string) => {
     platform: executed[4] || 'common',
     block: executed[1],
     element: executed[5],
-    modifier: modifierName && {
-      name: modifierName,
-      value: executed[3] || executed[7] || true,
-    },
+    modifier: modifierName
+      ? {
+          name: modifierName,
+          value: executed[3] || executed[7] || true,
+        }
+      : undefined,
   }
 }
 

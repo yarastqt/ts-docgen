@@ -9,6 +9,7 @@ import {
   VariableStatement,
   TypeAliasDeclaration,
   InterfaceDeclaration,
+  TypeFormatFlags,
 } from 'ts-morph'
 
 import { Maybe } from './utility-types'
@@ -160,11 +161,25 @@ export const getPropDefaultValue = (symbol: Symbol): Maybe<string> => {
   return undefined
 }
 
+const getPropTypes = (symbol: Symbol): string[] => {
+  const type = getDeclaration(symbol).getType()
+  const unionTypes = []
+
+  if (type.isUnion()) {
+    unionTypes.push(...type.getUnionTypes())
+  } else {
+    unionTypes.push(type)
+  }
+
+  return unionTypes.map((unionType) => unionType.getText(undefined, TypeFormatFlags.InTypeAlias))
+}
+
 export type PropType = {
   name: string
   description?: string
   optional: boolean
   defaultValue?: string
+  types: string[]
 }
 
 export const createPropType = (symbol: Symbol): PropType => {
@@ -173,6 +188,7 @@ export const createPropType = (symbol: Symbol): PropType => {
     description: getPropDescription(symbol),
     optional: isOptionalProp(symbol),
     defaultValue: getPropDefaultValue(symbol),
+    types: getPropTypes(symbol),
   }
 }
 

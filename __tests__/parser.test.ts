@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { getComponentsMap } from '../src/core/walker'
 import { extractMetaFromComponents } from '../src/core/parser'
 import { jsDocResolver } from '../src/core/resolvers/jsdoc-resolver'
+import { bemAdapter } from '../src/core/adapters/bem-adapter'
 
 type ComponentsMeta = ReturnType<typeof extractMetaFromComponents>
 
@@ -14,6 +15,10 @@ describe('parser', () => {
       const componentsMap = await getComponentsMap(source)
       const component1FilePath = componentsMap.get('Component1')
       componentsMeta = extractMetaFromComponents(component1FilePath!, [jsDocResolver])
+    })
+
+    test.only('sada', () => {
+      bemAdapter(componentsMeta)
     })
 
     test('should return base information from component', async () => {

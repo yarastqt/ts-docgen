@@ -14,6 +14,12 @@
       "env": {
         "jest": true
       }
+    },
+    {
+      "files": ["**/__fixtures__/**/*.{ts,tsx}"],
+      "rules": {
+        "unicorn/filename-case": "off"
+      }
     }
   ]
 }

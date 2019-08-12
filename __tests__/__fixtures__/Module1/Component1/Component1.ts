@@ -7,7 +7,7 @@ export type Component1Props = {
   /**
    * prop2 description.
    */
-  prop2?: string
+  prop2?: number
 }
 
 /**

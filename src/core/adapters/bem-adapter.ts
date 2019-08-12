@@ -64,6 +64,8 @@ export const bemAdapter = (meta: EnhancedResolverData[]) => {
           componentName,
           description,
           files: [filePath],
+          // TODO: remove platform
+          readmePath: filePath.replace(/\..+$/, '.md'),
           props: {
             [platform]: props,
           },
@@ -90,8 +92,10 @@ export const bemAdapter = (meta: EnhancedResolverData[]) => {
         // Add props for modifier at current platform.
         temporaryMap.set(modifier.name, {
           componentName: undefined,
-          description,
+          description: undefined,
           files: [filePath],
+          // TODO: remove platform and mod value
+          readmePath: filePath.replace(/\..+$/, '.md'),
           props: {
             [platform]: props,
           },
